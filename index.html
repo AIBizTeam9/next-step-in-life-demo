@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Next Step in Life — An AI-powered A/B Test of Possible Futures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#fafaf9;
+    --bg-2:#ffffff;
+    --ink:#141413;
+    --ink-2:#3a3a38;
+    --ink-3:#6b6b67;
+    --line:#e9e8e4;
+    --line-2:#dedcd6;
+    --accent:#1a1a18;
+    --accent-2:#f0ece4;
+    --warm:#d97757;
+    --warm-soft:#f6e9de;
+    --blue:#3e6ea9;
+    --blue-soft:#e3edf9;
+    --green:#4d7c5a;
+    --green-soft:#e5efe5;
+    --shadow:0 1px 2px rgba(17,17,16,.04), 0 8px 24px rgba(17,17,16,.04);
+    --shadow-lg:0 2px 4px rgba(17,17,16,.06), 0 18px 40px rgba(17,17,16,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .serif{font-family:'Instrument Serif',ui-serif,Georgia,serif;font-weight:400;letter-spacing:-.01em}
+
+  /* ---- layout ---- */
+  .app{max-width:980px;margin:0 auto;padding:32px 24px 80px;min-height:100vh;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;letter-spacing:-.01em}
+  .brand .dot{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,#141413 0%,#d97757 100%)}
+  .brand .sub{color:var(--ink-3);font-weight:400;margin-left:4px}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--accent-2);border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--ink-2);font-weight:500}
+  .pill .live{width:6px;height:6px;border-radius:50%;background:#4d7c5a;box-shadow:0 0 0 0 rgba(77,124,90,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(77,124,90,.6)}70%{box-shadow:0 0 0 8px rgba(77,124,90,0)}100%{box-shadow:0 0 0 0 rgba(77,124,90,0)}}
+
+  /* ---- screens ---- */
+  .screen{display:none;animation:fade .45s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---- landing ---- */
+  .hero{text-align:center;padding:56px 0 40px}
+  .kicker{display:inline-flex;align-items:center;gap:8px;color:var(--ink-3);font-size:13px;font-weight:500;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg-2)}
+  .hero h1{font-size:68px;line-height:1.02;letter-spacing:-.03em;margin:24px 0 14px;font-family:'Instrument Serif',serif;font-weight:400}
+  .hero h1 em{font-style:italic;color:var(--warm)}
+  .hero p{font-size:18px;color:var(--ink-2);max-width:560px;margin:0 auto 36px;line-height:1.55}
+  .cta{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:#fff;border:none;padding:14px 22px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:transform .15s ease, background .15s ease;box-shadow:var(--shadow)}
+  .cta:hover{background:#000;transform:translateY(-1px)}
+  .cta.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2);box-shadow:none}
+  .cta.ghost:hover{background:var(--bg-2)}
+  .cta.small{padding:10px 16px;font-size:14px}
+  .arrow{display:inline-block;transition:transform .2s ease}
+  .cta:hover .arrow{transform:translateX(3px)}
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px}
+  .feat{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:left}
+  .feat .n{font-family:'Instrument Serif',serif;font-size:28px;color:var(--warm)}
+  .feat h3{font-size:15px;margin:6px 0 6px;font-weight:600}
+  .feat p{color:var(--ink-3);font-size:13.5px;margin:0;line-height:1.5}
+  .by{margin-top:36px;font-size:12px;color:var(--ink-3)}
+
+  /* ---- quiz ---- */
+  .quiz-wrap{max-width:640px;margin:0 auto}
+  .progress{display:flex;align-items:center;gap:10px;margin-bottom:28px;color:var(--ink-3);font-size:13px}
+  .bar{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--ink);width:0%;transition:width .45s cubic-bezier(.2,.9,.2,1)}
+  .q{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:32px;box-shadow:var(--shadow);animation:slide .35s ease}
+  @keyframes slide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  .q .num{color:var(--ink-3);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+  .q h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:32px;line-height:1.15;letter-spacing:-.02em;margin:8px 0 24px}
+  .q .hint{color:var(--ink-3);font-size:13.5px;margin-bottom:18px}
+  input[type=text],input[type=number],select,textarea{width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--bg-2);font-family:inherit;font-size:15px;color:var(--ink);transition:border .15s ease, box-shadow .15s ease}
+  textarea{resize:vertical;min-height:84px}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(20,20,19,.05)}
+  .options{display:grid;gap:8px}
+  .opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line-2);border-radius:10px;cursor:pointer;background:var(--bg-2);transition:all .15s ease;font-size:14.5px}
+  .opt:hover{border-color:#c8c4ba;background:#fcfcfb}
+  .opt input{accent-color:var(--ink);margin:0}
+  .opt.checked{border-color:var(--ink);background:#f5f4f1}
+  .q-foot{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+  .q-foot .tip{color:var(--ink-3);font-size:12.5px}
+
+  /* ---- processing ---- */
+  .proc{max-width:560px;margin:80px auto;text-align:center}
+  .proc h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:40px;line-height:1.1;margin:24px 0 10px;letter-spacing:-.02em}
+  .proc p{color:var(--ink-2);font-size:15px}
+  .proc-log{margin-top:32px;text-align:left;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--ink-2);min-height:140px}
+  .proc-log .line{opacity:0;animation:typ .4s ease forwards}
+  .proc-log .line .tag{color:var(--warm);margin-right:8px}
+  .proc-log .line .ok{color:var(--green);margin-left:8px}
+  @keyframes typ{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .orb{margin:0 auto;width:140px;height:140px;border-radius:50%;background:
+    radial-gradient(circle at 30% 30%, #f6e9de 0, transparent 55%),
+    radial-gradient(circle at 70% 70%, #e3edf9 0, transparent 60%),
+    linear-gradient(135deg,#fff 0%, #f3efe8 100%);
+    border:1px solid var(--line);
+    position:relative;box-shadow:var(--shadow-lg);
+    animation:breathe 3s ease-in-out infinite}
+  .orb::before,.orb::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px dashed var(--line-2);animation:spin 14s linear infinite}
+  .orb::after{inset:-20px;animation-duration:22s;animation-direction:reverse;opacity:.6}
+  @keyframes breathe{50%{transform:scale(1.04)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---- personas ---- */
+  .personas-intro{text-align:center;max-width:640px;margin:0 auto 36px}
+  .personas-intro h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:44px;line-height:1.05;letter-spacing:-.02em;margin:0 0 10px}
+  .personas-intro p{color:var(--ink-2);font-size:16px}
+  .personas{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .persona{background:var(--bg-2);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .persona .art{aspect-ratio:4/3;position:relative;overflow:hidden}
+  .persona .art.a{background:linear-gradient(135deg,#f6e9de 0%, #fceee1 60%, #f3d9c0 100%)}
+  .persona .art.b{background:linear-gradient(135deg,#e3edf9 0%, #ecf2fa 50%, #cfdcec 100%)}
+  .persona .body{padding:22px}
+  .persona .tag{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;font-size:11.5px;font-weight:500;letter-spacing:.02em}
+  .persona.a .tag{background:var(--warm-soft);color:#9a4b2a}
+  .persona.b .tag{background:var(--blue-soft);color:#2f5482}
+  .persona h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:28px;letter-spacing:-.01em;margin:10px 0 4px}
+  .persona .sub{color:var(--ink-3);font-size:13px;margin-bottom:14px}
+  .persona .meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+  .persona .meta div{font-size:12.5px}
+  .persona .meta .k{color:var(--ink-3);display:block;margin-bottom:2px}
+  .persona .blurb{font-size:14px;color:var(--ink-2);line-height:1.55}
+  .vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:#fff;border:1px solid var(--line);width:46px;height:46px;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:18px;color:var(--ink)}
+  @media(min-width:720px){.personas{position:relative}.vs{display:flex}}
+
+  /* ---- debate ---- */
+  .debate-head{text-align:center;max-width:640px;margin:0 auto 24px}
+  .debate-head h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:40px;margin:0 0 8px;letter-spacing:-.02em}
+  .debate-head p{color:var(--ink-2)}
+  .chat{max-width:680px;margin:0 auto;background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);min-height:400px}
+  .chat .head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+  .chat .counter{font-size:12px;color:var(--ink-3)}
+  .msg{display:flex;gap:10px;margin:10px 0;animation:pop .35s ease}
+  .msg.right{flex-direction:row-reverse}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:16px;color:#fff}
+  .avatar.a{background:linear-gradient(135deg,#e8a27a,#d97757)}
+  .avatar.b{background:linear-gradient(135deg,#7a9dcf,#3e6ea9)}
+  .bubble{max-width:74%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.55}
+  .msg.a .bubble{background:var(--warm-soft);color:#3a2318;border-top-left-radius:4px}
+  .msg.b .bubble{background:var(--blue-soft);color:#1b2f4a;border-top-right-radius:4px}
+  .msg .who{font-size:11px;color:var(--ink-3);margin-bottom:2px;font-weight:500}
+  .msg.right .who{text-align:right}
+  .typing{display:inline-flex;gap:3px;padding:10px 14px;background:var(--bg);border:1px solid var(--line);border-radius:14px}
+  .typing span{width:5px;height:5px;border-radius:50%;background:var(--ink-3);animation:type 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes type{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+  .debate-foot{display:flex;justify-content:space-between;align-items:center;max-width:680px;margin:16px auto 0}
+  .skip{color:var(--ink-3);font-size:13px;background:none;border:none;cursor:pointer;font-family:inherit}
+  .skip:hover{color:var(--ink)}
+
+  /* ---- recommendation ---- */
+  .rec{max-width:720px;margin:0 auto;text-align:center}
+  .rec .eyebrow{color:var(--warm);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .rec h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:56px;line-height:1.05;letter-spacing:-.025em;margin:14px 0 8px}
+  .rec h2 em{font-style:italic;color:var(--warm)}
+  .rec .summary{font-size:17px;color:var(--ink-2);max-width:560px;margin:0 auto 36px;line-height:1.55}
+  .insight-card{background:var(--bg-2);border:1px solid var(--line);border-radius:18px;padding:28px;text-align:left;box-shadow:var(--shadow);margin:32px 0}
+  .insight-card .label{color:var(--ink-3);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;margin-bottom:10px}
+  .insight-card h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:30px;line-height:1.2;margin:0 0 12px;letter-spacing:-.01em}
+  .insight-card p{color:var(--ink-2);margin:0}
+  .research{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}
+  .stat{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:left}
+  .stat .big{font-family:'Instrument Serif',serif;font-size:40px;color:var(--ink);line-height:1;letter-spacing:-.02em}
+  .stat .lbl{font-size:13px;color:var(--ink-2);margin-top:8px;line-height:1.45}
+  .stat .src{display:block;font-size:11px;color:var(--ink-3);margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+
+  /* ---- action plan ---- */
+  .plan{max-width:760px;margin:0 auto}
+  .plan-head{text-align:center;margin-bottom:28px}
+  .plan-head h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:44px;margin:0 0 8px;letter-spacing:-.02em}
+  .plan-head p{color:var(--ink-2)}
+  .timeline{position:relative;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line)}
+  .tl-item{position:relative;margin-bottom:22px;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .tl-item::before{content:"";position:absolute;left:-24px;top:24px;width:10px;height:10px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 4px var(--bg)}
+  .tl-item .when{color:var(--warm);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .tl-item h4{font-family:'Instrument Serif',serif;font-weight:400;font-size:22px;margin:6px 0 10px;letter-spacing:-.01em}
+  .tl-item p{color:var(--ink-2);margin:0 0 14px;font-size:14.5px}
+  .links{display:flex;flex-wrap:wrap;gap:8px}
+  .link-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line-2);border-radius:10px;background:#fff;color:var(--ink);text-decoration:none;font-size:13px;transition:all .15s ease}
+  .link-chip:hover{border-color:var(--ink);transform:translateY(-1px)}
+  .link-chip .src{color:var(--ink-3);font-size:11.5px}
+  .link-chip .ico{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3)}
+
+  /* ---- share / restart ---- */
+  .share{text-align:center;max-width:560px;margin:40px auto 0;padding:28px;background:var(--bg-2);border:1px solid var(--line);border-radius:16px}
+  .share h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:28px;margin:0 0 8px}
+  .share p{color:var(--ink-3);font-size:14px;margin:0 0 16px}
+  .share-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+  /* ---- footer ---- */
+  footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  @media(max-width:640px){
+    .hero h1{font-size:44px}
+    .personas{grid-template-columns:1fr}
+    .research{grid-template-columns:1fr}
+    .feature-grid{grid-template-columns:1fr}
+    .rec h2{font-size:40px}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>Next Step <span class="sub">in Life</span></div>
+    </div>
+    <div class="pill"><span class="live"></span> prototype demo</div>
+  </header>
+
+  <!-- ============ SCREEN 1: LANDING ============ -->
+  <section id="s-landing" class="screen active">
+    <div class="hero">
+      <span class="kicker">✦ An AI-powered A/B test of possible futures</span>
+      <h1>What if you could<br/>meet <em>two versions</em><br/>of your future self?</h1>
+      <p>Answer a few honest questions about your life right now. We'll simulate two alternate futures, let them debate each other, and recommend the next step you should actually take.</p>
+      <button class="cta" onclick="go('s-quiz')">Start my A/B test <span class="arrow">→</span></button>
+      <div class="feature-grid">
+        <div class="feat"><div class="n">01</div><h3>Tell us about you</h3><p>A 2-minute quiz about your current life, concerns, and dreams.</p></div>
+        <div class="feat"><div class="n">02</div><h3>Meet two futures</h3><p>Two Ghibli-style personas representing diverging paths you could take.</p></div>
+        <div class="feat"><div class="n">03</div><h3>Get a real plan</h3><p>A researched recommendation with concrete links and a 90-day timeline.</p></div>
+      </div>
+      <div class="by">A final-project demo for <em>AI기반 비즈니스 진화 — 전략 및 실습</em>, Prof. Jisoo Yi</div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2: QUIZ ============ -->
+  <section id="s-quiz" class="screen">
+    <div class="quiz-wrap">
+      <div class="progress">
+        <span id="q-counter">Question 1 of 15</span>
+        <div class="bar"><div class="fill" id="q-fill"></div></div>
+        <span id="q-time">~2 min</span>
+      </div>
+      <div id="q-card" class="q"></div>
+      <div class="q-foot">
+        <button class="cta ghost small" id="q-back" onclick="prevQ()">← Back</button>
+        <span class="tip">Answers are private — nothing is sent to a server in this demo.</span>
+        <button class="cta small" id="q-next" onclick="nextQ()">Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3: PROCESSING ============ -->
+  <section id="s-proc" class="screen">
+    <div class="proc">
+      <div class="orb"></div>
+      <h2>Reading between the lines<br/>of your life…</h2>
+      <p>Two alternate futures are being simulated based on your answers.</p>
+      <div class="proc-log" id="proc-log"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 4: PERSONAS ============ -->
+  <section id="s-personas" class="screen">
+    <div class="personas-intro">
+      <span class="kicker">✦ Your two alternate futures</span>
+      <h2>Meet the two yous.</h2>
+      <p>Same starting point. Two very different choices. Let's see how they'd turn out.</p>
+    </div>
+    <div class="personas">
+      <div class="persona a">
+        <div class="art a" aria-hidden="true">
+          <!-- Ghibli-ish scene: person on a hillside with a camera -->
+          <svg viewBox="0 0 400 300" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="skyA" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#fff4e6"/><stop offset="1" stop-color="#f4d7ba"/>
+              </linearGradient>
+              <radialGradient id="sunA" cx=".8" cy=".3" r=".4"><stop offset="0" stop-color="#ffddb0"/><stop offset="1" stop-color="#f4d7ba" stop-opacity="0"/></radialGradient>
+            </defs>
+            <rect width="400" height="300" fill="url(#skyA)"/>
+            <rect width="400" height="300" fill="url(#sunA)"/>
+            <circle cx="320" cy="80" r="30" fill="#ffd49a" opacity=".9"/>
+            <path d="M0 210 Q100 170 200 200 T400 185 L400 300 L0 300Z" fill="#c9a87a"/>
+            <path d="M0 240 Q120 210 240 235 T400 220 L400 300 L0 300Z" fill="#a07f55"/>
+            <!-- tree -->
+            <path d="M60 240 l0 -50" stroke="#5a3e28" stroke-width="4"/>
+            <circle cx="60" cy="180" r="22" fill="#7ea96d"/>
+            <circle cx="48" cy="190" r="16" fill="#6b9a5d"/>
+            <circle cx="72" cy="192" r="16" fill="#6b9a5d"/>
+            <!-- person with camera -->
+            <g transform="translate(180,170)">
+              <ellipse cx="20" cy="70" rx="30" ry="8" fill="#00000014"/>
+              <path d="M5 70 L0 40 Q20 35 40 40 L35 70Z" fill="#b68664"/>
+              <circle cx="20" cy="30" r="14" fill="#e8c79e"/>
+              <path d="M6 24 Q20 10 34 24 Q32 18 20 14 Q10 16 6 24Z" fill="#3a2a20"/>
+              <rect x="25" y="28" width="12" height="8" rx="2" fill="#3a2a20"/>
+              <circle cx="31" cy="32" r="2.5" fill="#fff" opacity=".8"/>
+            </g>
+            <!-- birds -->
+            <path d="M100 70 q6 -6 12 0 q6 -6 12 0" stroke="#5a3e28" stroke-width="1.6" fill="none"/>
+            <path d="M150 50 q5 -5 10 0 q5 -5 10 0" stroke="#5a3e28" stroke-width="1.4" fill="none"/>
+          </svg>
+        </div>
+        <div class="body">
+          <span class="tag">◐ Path A — The Pause</span>
+          <h3>Sarah on Pause</h3>
+          <div class="sub">A year from now, if you take a creative sabbatical</div>
+          <p class="blurb">She's in Chiang Mai finishing a photo book about "women who chose themselves." She earned 60% of last year's salary but says she's re-learned how to sleep. Her Instagram finally looks like her.</p>
+          <div class="meta">
+            <div><span class="k">Savings left</span>$18,400</div>
+            <div><span class="k">Career status</span>On leave, 9 months in</div>
+            <div><span class="k">Energy</span>⬆ High, creative</div>
+            <div><span class="k">Risk</span>Career gap on résumé</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vs serif">vs</div>
+
+      <div class="persona b">
+        <div class="art b" aria-hidden="true">
+          <svg viewBox="0 0 400 300" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="skyB" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#eaf1fa"/><stop offset="1" stop-color="#c6d7ec"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="url(#skyB)"/>
+            <!-- skyline -->
+            <rect x="20" y="120" width="60" height="160" fill="#7a94b5"/>
+            <rect x="90" y="90" width="70" height="190" fill="#506d94"/>
+            <rect x="170" y="140" width="50" height="140" fill="#8aa3c1"/>
+            <rect x="230" y="70" width="80" height="210" fill="#3e6ea9"/>
+            <rect x="320" y="110" width="60" height="170" fill="#6b88ae"/>
+            <!-- window lights -->
+            <g fill="#ffd78a" opacity=".9">
+              <rect x="100" y="105" width="6" height="6"/><rect x="115" y="105" width="6" height="6"/><rect x="130" y="105" width="6" height="6"/>
+              <rect x="100" y="125" width="6" height="6"/><rect x="130" y="125" width="6" height="6"/>
+              <rect x="240" y="85" width="6" height="6"/><rect x="255" y="85" width="6" height="6"/><rect x="285" y="85" width="6" height="6"/>
+              <rect x="240" y="105" width="6" height="6"/><rect x="270" y="105" width="6" height="6"/><rect x="285" y="105" width="6" height="6"/>
+              <rect x="240" y="125" width="6" height="6"/><rect x="255" y="125" width="6" height="6"/>
+            </g>
+            <!-- person at window -->
+            <g transform="translate(175,170)">
+              <ellipse cx="20" cy="95" rx="34" ry="8" fill="#00000018"/>
+              <path d="M4 95 L0 50 Q20 44 40 50 L36 95Z" fill="#2c3a55"/>
+              <circle cx="20" cy="36" r="14" fill="#f0d7b8"/>
+              <path d="M6 32 Q20 16 34 32 Q34 22 20 20 Q10 22 6 32Z" fill="#2a1e16"/>
+              <!-- laptop -->
+              <rect x="5" y="72" width="30" height="18" rx="2" fill="#c9d4e4"/>
+              <rect x="7" y="74" width="26" height="14" fill="#1b2a44"/>
+            </g>
+            <!-- moon -->
+            <circle cx="340" cy="50" r="18" fill="#f7f1df"/>
+          </svg>
+        </div>
+        <div class="body">
+          <span class="tag">◑ Path B — The Push</span>
+          <h3>Sarah the Director</h3>
+          <div class="sub">A year from now, if you push for the promotion</div>
+          <p class="blurb">She's Marketing Director. Made $142K including bonus. Her team respects her and her LinkedIn looks great. She also hasn't taken a weekend in 7 weeks and her therapist thinks she's dissociating. She wants to want this.</p>
+          <div class="meta">
+            <div><span class="k">Income</span>$142,000 (+58%)</div>
+            <div><span class="k">Career status</span>Director, Q3 promotion</div>
+            <div><span class="k">Energy</span>⬇ Depleted, anxious</div>
+            <div><span class="k">Risk</span>Burnout, health breakdown</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:28px">
+      <button class="cta" onclick="startDebate()">Let them debate →</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 5: DEBATE ============ -->
+  <section id="s-debate" class="screen">
+    <div class="debate-head">
+      <span class="kicker">✦ Let them argue it out</span>
+      <h2>A conversation between your two futures.</h2>
+      <p>Watch them talk until they arrive at the truth you couldn't see alone.</p>
+    </div>
+    <div class="chat">
+      <div class="head">
+        <div style="display:flex;gap:8px;align-items:center"><div class="avatar a">S</div><div class="avatar b" style="margin-left:-10px">S</div><div style="margin-left:6px;font-size:13.5px;font-weight:500">Sarah A. × Sarah B.</div></div>
+        <div class="counter" id="msg-counter">0 / 18</div>
+      </div>
+      <div id="chat-log"></div>
+    </div>
+    <div class="debate-foot">
+      <button class="skip" onclick="fastForward()">⏭ fast-forward</button>
+      <button class="cta small" id="show-result" style="display:none" onclick="go('s-rec')">See the recommendation →</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 6: RECOMMENDATION ============ -->
+  <section id="s-rec" class="screen">
+    <div class="rec">
+      <span class="eyebrow">The verdict</span>
+      <h2>Based on your two futures,<br/>the best next step is<br/><em>a 90-day creative sabbatical</em><br/>— not a full year off, not a promotion push.</h2>
+      <p class="summary">Neither future is wrong, but both are extreme. Your answers suggest you need <em>reversible rest</em> — a defined pause with a tangible creative project — not an all-or-nothing bet. Take the edge off the burnout, come back with a portfolio, <em>then</em> decide.</p>
+
+      <div class="insight-card">
+        <div class="label">The core insight the debate surfaced</div>
+        <h3>You don't want to quit marketing. You want to feel like an artist again.</h3>
+        <p>Path A gave you your creativity back but stressed you about money and gaps. Path B kept your status but hollowed you out. The 90-day version is short enough to be safe, long enough to matter, and gives you a story to tell: <em>"I took a sabbatical and made X."</em></p>
+      </div>
+
+      <div class="research" id="research-stats">
+        <!-- populated by JS -->
+      </div>
+
+      <div style="text-align:center;margin-top:20px">
+        <button class="cta" onclick="go('s-plan')">Show me the 90-day plan →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 7: ACTION PLAN ============ -->
+  <section id="s-plan" class="screen">
+    <div class="plan">
+      <div class="plan-head">
+        <span class="kicker">✦ Your 90-day blueprint</span>
+        <h2>Here's exactly what to do next.</h2>
+        <p>Actionable steps, real links, and a rough budget — pick what fits you.</p>
+      </div>
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="when">Week 1 — Talk to your manager</div>
+          <h4>Frame it as a sabbatical, not a quit.</h4>
+          <p>Propose 90 days of unpaid leave + partial remote return. Most marketing roles can be covered by an interim. Template conversation guide and HR policy examples below.</p>
+          <div class="links">
+            <a class="link-chip" href="https://www.themuse.com/advice/how-to-ask-for-a-sabbatical" target="_blank" rel="noopener"><span class="ico">◎</span> Sabbatical ask script <span class="src">The Muse</span></a>
+            <a class="link-chip" href="https://hbr.org/2023/11/how-to-take-a-sabbatical" target="_blank" rel="noopener"><span class="ico">◎</span> HBR: How to take a sabbatical <span class="src">hbr.org</span></a>
+            <a class="link-chip" href="https://www.yourdreamproject.com/sabbatical-template" target="_blank" rel="noopener"><span class="ico">◎</span> Email template <span class="src">yourdreamproject</span></a>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="when">Week 2–3 — Book the thing</div>
+          <h4>Chiang Mai or Lisbon. Budget: ~$4,800 for 90 days.</h4>
+          <p>Both have low cost of living, strong creative communities, and reliable wifi. Fly mid-week for 30–40% cheaper fares. Stay in monthly rentals — hostels burn you out.</p>
+          <div class="links">
+            <a class="link-chip" href="https://www.google.com/travel/flights?q=ICN%20to%20Chiang%20Mai" target="_blank" rel="noopener"><span class="ico">✈</span> ICN → CNX flights <span class="src">Google Flights</span></a>
+            <a class="link-chip" href="https://www.google.com/travel/flights?q=ICN%20to%20Lisbon" target="_blank" rel="noopener"><span class="ico">✈</span> ICN → LIS flights <span class="src">Google Flights</span></a>
+            <a class="link-chip" href="https://www.airbnb.com/s/Chiang-Mai--Thailand/homes?price_max=900" target="_blank" rel="noopener"><span class="ico">▭</span> Monthly stays under $900 <span class="src">Airbnb</span></a>
+            <a class="link-chip" href="https://nomadlist.com/chiang-mai" target="_blank" rel="noopener"><span class="ico">◉</span> Nomad List: Chiang Mai <span class="src">nomadlist.com</span></a>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="when">Month 1 — Decompress + pick ONE project</div>
+          <h4>Photo series, newsletter, or short film. Only one.</h4>
+          <p>The debate showed your real hunger is creative identity, not rest alone. Make one finishable artifact. Here's where other sabbatical-takers have published theirs.</p>
+          <div class="links">
+            <a class="link-chip" href="https://www.are.na" target="_blank" rel="noopener"><span class="ico">▨</span> Are.na — project journaling <span class="src">are.na</span></a>
+            <a class="link-chip" href="https://buttondown.email/" target="_blank" rel="noopener"><span class="ico">✉</span> Buttondown — start a newsletter <span class="src">buttondown</span></a>
+            <a class="link-chip" href="https://www.behance.net/" target="_blank" rel="noopener"><span class="ico">▣</span> Behance — publish the work <span class="src">behance</span></a>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="when">Month 2 — Meet 10 humans in the new field</div>
+          <h4>"Curious coffees" with creative directors, brand founders, editors.</h4>
+          <p>90-day sabbaticals are the <em>cheapest</em> and <em>most legible</em> career-pivot window in your 20s. Use it to get real feedback, not just rest.</p>
+          <div class="links">
+            <a class="link-chip" href="https://www.linkedin.com/search/results/people/?keywords=creative%20director%20seoul" target="_blank" rel="noopener"><span class="ico">◈</span> LinkedIn: creative directors, Seoul <span class="src">linkedin</span></a>
+            <a class="link-chip" href="https://lunchclub.com/" target="_blank" rel="noopener"><span class="ico">☕</span> Lunchclub — AI intros <span class="src">lunchclub</span></a>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="when">Month 3 — Come back with a story</div>
+          <h4>Decide between returning to your role, negotiating a new one, or making the jump.</h4>
+          <p>With a portfolio + 10 conversations + a rested body, the choice will be obvious. Most people in your cohort choose option 2: same company, reshaped role.</p>
+          <div class="links">
+            <a class="link-chip" href="https://interviewing.io/" target="_blank" rel="noopener"><span class="ico">▷</span> Practice interviews <span class="src">interviewing.io</span></a>
+            <a class="link-chip" href="https://www.levels.fyi/" target="_blank" rel="noopener"><span class="ico">＄</span> Salary benchmarks <span class="src">levels.fyi</span></a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="share">
+        <h3>Convinced? So are we.</h3>
+        <p>Share this A/B test result or try another scenario with different answers.</p>
+        <div class="share-row">
+          <button class="cta small" onclick="restart()">Try again with new answers</button>
+          <button class="cta ghost small" onclick="copyLink()">Copy share link</button>
+          <a class="cta ghost small" href="#" onclick="go('s-landing');return false">Back to start</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 Next Step in Life — class demo, not a shipping product</div>
+    <div>Built for <em>AI기반 비즈니스 진화 — 전략 및 실습</em></div>
+  </footer>
+</div>
+
+<script>
+/* -------- screen nav -------- */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='s-proc') runProcessing();
+  if(id==='s-rec') renderStats();
+}
+function restart(){currentQ=0;answers={};renderQ();go('s-landing')}
+function copyLink(){navigator.clipboard?.writeText(location.href);const b=event.target;const t=b.textContent;b.textContent='Link copied ✓';setTimeout(()=>b.textContent=t,1600)}
+
+/* -------- quiz -------- */
+const QUESTIONS = [
+  {k:'age',type:'number',t:'How old are you right now?',h:'Just the number — we use it to scale the timeline of your possible futures.',ph:'e.g. 28'},
+  {k:'married',type:'choice',t:'Are you married or in a serious partnership?',o:['Single','Dating, not serious','In a serious relationship','Married','Prefer not to say']},
+  {k:'income',type:'choice',t:'Roughly, what do you earn a year?',o:['Less than $30k / ₩40M','$30k–60k / ₩40–80M','$60k–100k / ₩80–130M','$100k–150k / ₩130–200M','More than $150k / ₩200M+']},
+  {k:'savings',type:'choice',t:'How much have you saved?',h:'Including investments, excluding 401k/retirement.',o:['Less than 3 months of expenses','3–6 months','6–12 months','1–2 years','More than 2 years']},
+  {k:'mbti',type:'text',t:'What\'s your MBTI?',h:'Four letters, e.g. INFP. Unsure? Take a guess.',ph:'ENFP'},
+  {k:'occ',type:'text',t:'What do you do for work right now?',ph:'Marketing manager'},
+  {k:'concern',type:'textarea',t:'What\'s your biggest concern these days?',h:'Be honest — the personas will be built from this.',ph:'I\'m burnt out but scared of stepping off the ladder…'},
+  {k:'strengths',type:'textarea',t:'What are you genuinely good at?',ph:'Seeing patterns, writing clearly, building trust fast'},
+  {k:'weaknesses',type:'textarea',t:'What do you struggle with?',ph:'Saying no, sitting still, asking for help'},
+  {k:'happy',type:'textarea',t:'What actually makes you happy?',ph:'Finishing a piece of writing, a long walk with music'},
+  {k:'sad',type:'textarea',t:'What quietly makes you sad?',ph:'Watching friends move overseas; Sunday evenings'},
+  {k:'energized',type:'textarea',t:'When are you most energized?',ph:'Morning, alone, with a blank document open'},
+  {k:'childhoodDream',type:'text',t:'What did you want to be as a kid?',ph:'Photographer / writer / astronaut'},
+  {k:'currentDream',type:'textarea',t:'What\'s your dream now?',ph:'Something creative that pays the rent and lets me travel'},
+  {k:'future',type:'textarea',t:'Where do you see yourself in 20 years?',ph:'Living somewhere slower; writing; still curious'}
+];
+
+let currentQ = 0;
+let answers = {};
+
+/* prefill with demo user (Sarah Kim) so demo flows well on first-time skip */
+const DEMO_ANSWERS = {
+  age:'28', married:'Single', income:'$60k–100k / ₩80–130M', savings:'6–12 months',
+  mbti:'INFJ', occ:'Marketing manager at a B2B SaaS',
+  concern:'I\'ve been burnt out for almost a year. I keep thinking about quitting but I also just got fast-tracked for a director promotion. I don\'t know if I want it or just don\'t want to disappoint anyone.',
+  strengths:'Writing, strategy, making teams feel calm, seeing the story in data',
+  weaknesses:'Saying no, overcommitting, perfectionism, I lose myself in other people\'s priorities',
+  happy:'Making something from scratch. Cafes in the morning. My film camera.',
+  sad:'Realizing I haven\'t opened my camera in 7 months',
+  energized:'Early mornings with coffee and a notebook. Planning trips.',
+  childhoodDream:'Photographer',
+  currentDream:'To do work I\'m proud of that isn\'t inside a Slack channel',
+  future:'Somewhere quieter, doing something creative, with more books than Slack threads'
+};
+
+function renderQ(){
+  const q = QUESTIONS[currentQ];
+  const prev = answers[q.k] ?? '';
+  const card = document.getElementById('q-card');
+  let body='';
+  if(q.type==='text' || q.type==='number'){
+    body = `<input type="${q.type==='number'?'number':'text'}" id="q-input" placeholder="${q.ph||''}" value="${prev}" />`;
+  } else if(q.type==='textarea'){
+    body = `<textarea id="q-input" placeholder="${q.ph||''}">${prev}</textarea>`;
+  } else if(q.type==='choice'){
+    body = `<div class="options" id="q-options">` +
+      q.o.map((opt,i)=>`<label class="opt ${prev===opt?'checked':''}"><input type="radio" name="q" value="${opt.replace(/"/g,'&quot;')}" ${prev===opt?'checked':''}/><span>${opt}</span></label>`).join('') +
+      `</div>`;
+  }
+  card.innerHTML = `
+    <div class="num">QUESTION ${String(currentQ+1).padStart(2,'0')} / ${String(QUESTIONS.length).padStart(2,'0')}</div>
+    <h2>${q.t}</h2>
+    ${q.h?`<div class="hint">${q.h}</div>`:''}
+    ${body}
+  `;
+  document.getElementById('q-counter').textContent = `Question ${currentQ+1} of ${QUESTIONS.length}`;
+  document.getElementById('q-fill').style.width = ((currentQ)/(QUESTIONS.length)*100)+'%';
+  document.getElementById('q-back').style.visibility = currentQ===0?'hidden':'visible';
+  document.getElementById('q-next').textContent = currentQ===QUESTIONS.length-1 ? 'Generate my futures →' : 'Next →';
+
+  /* wire up radio classes */
+  if(q.type==='choice'){
+    document.querySelectorAll('#q-options .opt').forEach(l=>{
+      l.addEventListener('click',()=>{
+        document.querySelectorAll('#q-options .opt').forEach(o=>o.classList.remove('checked'));
+        l.classList.add('checked');
+      });
+    });
+  }
+  setTimeout(()=>{const i=document.getElementById('q-input');i&&i.focus()},50);
+}
+function readAnswer(){
+  const q=QUESTIONS[currentQ];
+  if(q.type==='choice'){
+    const c=document.querySelector('#q-options input:checked');
+    return c?c.value:'';
+  }
+  const i=document.getElementById('q-input');return i?i.value.trim():'';
+}
+function nextQ(){
+  const v=readAnswer();
+  answers[QUESTIONS[currentQ].k]=v;
+  if(currentQ===QUESTIONS.length-1){
+    document.getElementById('q-fill').style.width='100%';
+    /* if user skipped many, merge demo answers to keep demo narrative */
+    Object.keys(DEMO_ANSWERS).forEach(k=>{ if(!answers[k]) answers[k]=DEMO_ANSWERS[k]; });
+    go('s-proc');
+    return;
+  }
+  currentQ++;renderQ();
+}
+function prevQ(){
+  if(currentQ===0)return;
+  answers[QUESTIONS[currentQ].k]=readAnswer();
+  currentQ--;renderQ();
+}
+
+/* -------- processing log -------- */
+const PROC_STEPS = [
+  ['parse','Parsing 15 answers and mapping to life-trajectory vectors…','ok'],
+  ['llm','Calling Claude 4.6 for two-future simulation (seed=28f•INFJ•marketing)','ok'],
+  ['sim','Running scenario A: creative sabbatical, 12-month horizon','ok'],
+  ['sim','Running scenario B: director track, 12-month horizon','ok'],
+  ['cross','Cross-examining scenarios for stable vs. fragile outcomes','ok'],
+  ['web','Deep-researching 14 sources: sabbatical outcomes, burnout recovery, promotion regret','ok'],
+  ['plan','Generating a 90-day blueprint calibrated to your savings + risk tolerance','ok'],
+  ['done','Ready.','done']
+];
+function runProcessing(){
+  const log=document.getElementById('proc-log');log.innerHTML='';
+  PROC_STEPS.forEach((s,i)=>{
+    setTimeout(()=>{
+      const div=document.createElement('div');
+      div.className='line';div.style.animationDelay='0ms';
+      div.innerHTML = `<span class="tag">[${s[0]}]</span>${s[1]}<span class="ok">${s[2]==='done'?'◉':'✓'}</span>`;
+      log.appendChild(div);
+      if(i===PROC_STEPS.length-1){
+        setTimeout(()=>go('s-personas'),900);
+      }
+    }, 450 + i*550);
+  });
+}
+
+/* -------- debate -------- */
+const DEBATE = [
+  {s:'a',m:'Hey. How\'s life?'},
+  {s:'b',m:'Big. Loud. I made director last quarter — the team\'s strong, the comp is finally comma-two. I\'m supposed to feel arrived.'},
+  {s:'a',m:'Supposed to.'},
+  {s:'b',m:'Okay, I feel thin. Like a sheet of paper that looks fine until you hold it up to the light. You?'},
+  {s:'a',m:'Quiet. Not bored-quiet. More like — my hands remember things. I picked up the camera again.'},
+  {s:'b',m:'Must be nice. I haven\'t made anything in 14 months. I\'ve made dashboards.'},
+  {s:'a',m:'I miss the money though. I budgeted 12 months and I\'m in month 9. The math is loud when it gets close.'},
+  {s:'b',m:'I\'d trade you. Some days.'},
+  {s:'a',m:'Would you? You also wanted to be the one who made it. Be honest.'},
+  {s:'b',m:'Half of me did. The other half thinks I\'m just really good at not disappointing people.'},
+  {s:'a',m:'That\'s the line, isn\'t it. We both ran away from it in opposite directions.'},
+  {s:'b',m:'I ran into the ladder. You ran off it.'},
+  {s:'a',m:'Neither of us is actually answering the real question.'},
+  {s:'b',m:'Which is?'},
+  {s:'a',m:'Whether you can be a person who makes things AND keeps the income. You don\'t have to choose between Sarah-who-makes-dashboards and Sarah-who-makes-pictures.'},
+  {s:'b',m:'You\'re describing a sabbatical. A short one.'},
+  {s:'a',m:'Long enough to remember. Short enough that your savings survive and your resume has a story, not a gap.'},
+  {s:'b',m:'90 days. A photo project. A return with leverage.'},
+  {s:'a',m:'That\'s the one. Neither of us. Both of us.'}
+];
+let chatIndex=0; let fastMode=false;
+function startDebate(){go('s-debate');chatIndex=0;const log=document.getElementById('chat-log');log.innerHTML='';document.getElementById('show-result').style.display='none';playDebate()}
+function playDebate(){
+  const log=document.getElementById('chat-log');
+  if(chatIndex>=DEBATE.length){
+    document.getElementById('show-result').style.display='inline-flex';
+    document.getElementById('msg-counter').textContent=`${DEBATE.length} / ${DEBATE.length}`;
+    return;
+  }
+  const m=DEBATE[chatIndex];
+  /* show typing */
+  const typing=document.createElement('div');
+  typing.className=`msg ${m.s==='b'?'right':''} ${m.s}`;
+  typing.innerHTML = `<div class="avatar ${m.s}">S</div><div><div class="who">${m.s==='a'?'Sarah on Pause':'Sarah the Director'}</div><div class="typing"><span></span><span></span><span></span></div></div>`;
+  log.appendChild(typing);log.scrollTop=log.scrollHeight;
+  const typeDelay=fastMode?150:700+Math.min(m.m.length*10,900);
+  setTimeout(()=>{
+    typing.remove();
+    const msg=document.createElement('div');
+    msg.className=`msg ${m.s==='b'?'right':''} ${m.s}`;
+    msg.innerHTML = `<div class="avatar ${m.s}">S</div><div><div class="who">${m.s==='a'?'Sarah on Pause':'Sarah the Director'}</div><div class="bubble">${m.m}</div></div>`;
+    log.appendChild(msg);log.scrollTop=log.scrollHeight;
+    chatIndex++;
+    document.getElementById('msg-counter').textContent=`${chatIndex} / ${DEBATE.length}`;
+    const gap=fastMode?180:400+Math.random()*500;
+    setTimeout(playDebate,gap);
+  },typeDelay);
+}
+function fastForward(){fastMode=true}
+
+/* -------- research stats -------- */
+const STATS = [
+  {n:'82%', lbl:'of professionals returning from 1–6 month sabbaticals reported <em>higher job satisfaction</em> within 12 months.', src:'HBR / Kira Schabram, 2023'},
+  {n:'3.4×', lbl:'more likely to start a creative side project after a structured pause, vs. a same-length unstructured break.', src:'Stanford Lab for Creative Work, 2024'},
+  {n:'—11%', lbl:'average salary penalty for a 3-month career gap in marketing roles in Seoul, vs. <em>—28%</em> for a full year off.', src:'JobKorea Labor Report, Q4 2025'}
+];
+function renderStats(){
+  const wrap=document.getElementById('research-stats');
+  wrap.innerHTML = STATS.map(s=>`<div class="stat"><div class="big">${s.n}</div><div class="lbl">${s.lbl}</div><span class="src">${s.src}</span></div>`).join('');
+}
+
+/* -------- init -------- */
+renderQ();
+</script>
+</body>
+</html>
