@@ -38,13 +38,6 @@ Open `next-step-in-life.html` in any modern browser. No build step, no API key n
 - **State**: no auth, no DB — everything client-side. If we want "share your result," lean on a signed URL with embedded JSON.
 - **Image generation**: stable-diffusion XL with a fine-tuned Ghibli LoRA for persona art (or static SVGs like in the demo to keep it cheap)
 
-## Suggested team split (4 people)
-
-1. **Product / UX + narrative design** — writes the quiz, persona templates, debate script structure
-2. **Frontend** — Next.js app, animations, persona card visuals
-3. **LLM + research** — prompt engineering for persona + debate + web research tool use
-4. **Integration + launch** — GitHub repo, CI, GH Pages deploy, analytics, sharing flow
-
 ## Why this is good for the class
 
 - Hits all three vibe-coding pillars: creative product concept, multi-agent LLM design, shipped artifact.
@@ -52,11 +45,8 @@ Open `next-step-in-life.html` in any modern browser. No build step, no API key n
 - Visual + emotional + shareable → makes for a strong final presentation demo.
 
 ## Open questions for the team
-
 - Do we constrain to a persona-pair taxonomy (career pivot, relationship, city move, break) or let the LLM decide freely?
 - How many citations before diminishing returns? 3 feels right in the demo.
 - Do we localize Korean first or English first? (The quiz has a Seoul flavor baked in.)
 
----
-
-*This demo was built as a pitch artifact to propose the topic to our team of 4.*
+--
